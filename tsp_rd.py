@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import spatial
 from sko.ACA import ACA_TSP
+from generate_dataset import *
 
 ## Methods
 
@@ -36,23 +37,17 @@ def main():
         #plt.legend(loc ='lower right')
         #plt.show()
 
+    def calculate_distance(city_coordinate_matrix):
+        # Calculate distances of the paths between each city.
+        distance_matrix = spatial.distance.cdist(city_coordinate_matrix, city_coordinate_matrix, metric='euclidean')
+        return distance_matrix
+
     #Number of cities
     nCities = 6
-    grid_indexes =  np.arange(nCities)
-    #Release dates
-    release_dates = np.random.randint(0,nCities,nCities)
-    release_dates[0] = 0
 
-    
-    #Coordinate system
-    coordinates = np.array([(x,y) for x in grid_indexes for y in grid_indexes])
-
-    #Sample #nCities random coordinates
-    city_coordinates = np.random.rand(nCities, 2)
-
-    # Calculate distances of the paths between each city.
-    distance_matrix = spatial.distance.cdist(city_coordinates, city_coordinates, metric='euclidean')
-    distance_matrix
+    release_dates = generate_release_dates(nCities)
+    city_coordinates = generate_city_coordinates(nCities)
+    distance_matrix = calculate_distance(city_coordinates)
 
     # test:
     points = np.arange(nCities)  # generate index of points
