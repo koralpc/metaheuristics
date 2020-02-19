@@ -4,7 +4,36 @@
 #Imports
 import numpy as np
 import tsplib95
+import os
+import re
+import sys
 
+
+def read_all_datasets(directory):
+    files = os.listdir(directory)
+    tsp_problems = []
+    tsp_solutions = []
+    for filename in files:
+        if '.tsp' in filename:
+            tsp_problems.append(directory + '/' + filename)
+            trim_name = re.sub('.tsp','',filename)
+            tsp_solutions.append(directory + '/'+ trim_name + '.opt.tour')
+    return list(zip(tsp_problems,tsp_solutions))
+
+
+def read_tsp_file(filepath):
+    problem = tsplib95.load_problem(filepath)
+    city_coordinates = problem.node_coords
+    city_coordinates = np.array([pair[1] for pair in city_coordinates.items()])
+    max_coord = np.max(city_coordinates)
+    city_coordinates = city_coordinates / max_coord
+    return city_coordinates
+
+
+def read_optimal_solution(filepath):
+    solution = tsplib95.load_solution(filepath)
+    solution_tour = (solution.tours)[0]
+    return solution_tour
 
 def generate_release_dates(tour_size):
     release_dates = np.random.randint(0,tour_size,tour_size)

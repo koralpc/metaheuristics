@@ -42,11 +42,13 @@ def main():
         distance_matrix = spatial.distance.cdist(city_coordinate_matrix, city_coordinate_matrix, metric='euclidean')
         return distance_matrix
 
-    #Number of cities
-    nCities = 6
 
+    #city_coordinates = generate_city_coordinates(nCities)
+    datasets = read_all_datasets('tsp_datasets/')
+    city_coordinates = read_tsp_file(datasets[0][0])
+    nCities = len(city_coordinates)
     release_dates = generate_release_dates(nCities)
-    city_coordinates = generate_city_coordinates(nCities)
+    city_optimal_tour = read_optimal_solution(datasets[0][1])
     distance_matrix = calculate_distance(city_coordinates)
 
     # test:
