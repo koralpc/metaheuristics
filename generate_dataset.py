@@ -32,17 +32,15 @@ def read_tsp_file(filepath):
 
 def read_optimal_solution(filepath):
     solution = tsplib95.load_solution(filepath)
-    solution_tour = (solution.tours)[0]
+    solution_tour = np.array((solution.tours)[0]) - 1
     return solution_tour
 
-def generate_release_dates(tour_size):
-    release_dates = np.random.randint(0,tour_size,tour_size)
-    release_dates[0] = 0
+def generate_release_dates(tour_size,optimal_distance,Beta = 1):
+    release_dates = np.random.randint(0,optimal_distance * Beta,tour_size)
     return release_dates
 
 
 def generate_city_coordinates(tour_size):
-
     #Sample tour_size random coordinates
     city_coordinates = np.random.rand(tour_size, 2)
     return city_coordinates

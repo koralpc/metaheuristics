@@ -15,7 +15,7 @@ from generate_dataset import *
 def main():
     def calculate_total_distance(route):
         num_points, = route.shape
-        return sum([distance_matrix[route[i % num_points], route[(i + 1) % num_points]] for i in range(num_points)])
+        return sum([distance_matrix[route[i % num_points] , route[(i + 1) % num_points] ] for i in range(num_points)])
 
     def calculate_total_distance_with_rd(route):
         num_points, = route.shape
@@ -26,12 +26,17 @@ def main():
                 total_dist += release_dates[route[(i+1) % num_points]]
         return total_dist
 
-    def plotRoute(city_x,city_y,route):
+    def calculate_total_distance_up_bound(route,release_dates):
+        upper_bound_distance = calculate_total_distance(route) + np.max(release_dates)
+        return upper_bound_distance
+
+    def plotRoute(city_x,city_y,route,annotate = True):
         fig, ax = plt.subplots()
         ax.scatter(city_x,city_y,color ='red')
         for idx in range(len(route)):
             ax.plot([city_x[route[idx % len(route)]],city_x[route[(idx+1) % len(route)]]],[city_y[route[idx % len(route)]],city_y[route[(idx+1) % len(route)]]],label =str(idx+1),color = 'blue')
-            ax.annotate('Rd : {0} / City: {1}'.format(release_dates[idx],idx),(city_x[idx],city_y[idx]))
+            if annotate:
+                ax.annotate('Rd : {0} / City: {1}'.format(release_dates[idx],idx),(city_x[idx],city_y[idx]))
             #ax.annotate('Dist: {0:.3f}'.format(distance_matrix[route[idx % len(route)], route[(idx + 1) % len(route)]]),(np.mean([city_x[route[idx % len(route)]],city_x[route[(idx+1) % len(route)]]]),np.mean([city_y[route[idx % len(route)]],city_y[route[(idx+1) % len(route)]]])))
         plt.title('Total distance of this run is: {0:.4f}'.format(calculate_total_distance(route)))
         #plt.legend(loc ='lower right')
@@ -43,16 +48,18 @@ def main():
         return distance_matrix
 
 
-    #city_coordinates = generate_city_coordinates(nCities)
     datasets = read_all_datasets('tsp_datasets/')
     city_coordinates = read_tsp_file(datasets[0][0])
     nCities = len(city_coordinates)
-    release_dates = generate_release_dates(nCities)
     city_optimal_tour = read_optimal_solution(datasets[0][1])
     distance_matrix = calculate_distance(city_coordinates)
+    optimal_tour_distance = calculate_total_distance(city_optimal_tour)
+    release_dates = generate_release_dates(nCities,optimal_tour_distance)
+    optimal_up_bound = calculate_total_distance_up_bound(city_optimal_tour,release_dates)
+    print('Optimal {}  vs. Optimal + rd {}'.format(optimal_tour_distance,optimal_up_bound))
 
     # test:
-    points = np.arange(nCities)  # generate index of points
+    #points = np.arange(nCities)  # generate index of points
     #calculate_total_distance(points)
     #calculate_total_distance_with_rd(points)
 
@@ -60,12 +67,12 @@ def main():
     city_x = [city_coordinates[i][0] for i in range(nCities)]
     city_y = [city_coordinates[i][1] for i in range(nCities)]
 
-    plotRoute(city_x,city_y,points)
+    plotRoute(city_x,city_y,city_optimal_tour)
 
     #fig, ax = plt.subplots(1, 1)
-    best_points_ = np.concatenate([points, [points[0]]])
-    best_points_str = [str(p) for p in best_points_]
-    best_points_coordinate = city_coordinates[best_points_, :]
+    #best_points_ = np.concatenate([points, [points[0]]])
+    #best_points_str = [str(p) for p in best_points_]
+    #best_points_coordinate = city_coordinates[best_points_, :]
     #ax.plot(best_points_coordinate[:, 0], best_points_coordinate[:, 1], 'o-r')
     #plt.title('Initial route')
     #plt.legend(best_points_str)
