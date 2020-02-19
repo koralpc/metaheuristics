@@ -3,7 +3,7 @@
 
 #Imports
 import numpy as np
-
+import tsplib95
 
 
 def generate_release_dates(tour_size):
